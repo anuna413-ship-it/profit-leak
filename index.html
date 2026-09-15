@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ProfitLeak — Find where your Shopify orders lose money</title>
+<meta name="description" content="Upload a Shopify orders export and find unprofitable orders, products, discounts, and shipping thresholds. Everything runs locally in your browser." />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">PL</span>
+      <span class="brand-name">ProfitLeak</span>
+    </div>
+    <div class="privacy-pill" title="Your CSV is parsed and analyzed entirely in this browser tab. Nothing is uploaded anywhere.">
+      <span class="dot" aria-hidden="true"></span> Runs 100% in your browser — files never leave your device
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- LANDING -->
+  <section id="landing" class="wrap landing">
+    <div class="landing-copy">
+      <h1>Find the Shopify orders, products, discounts, and shipping rules that are silently costing you money.</h1>
+      <p class="lede">Upload your Shopify orders export. ProfitLeak groups line items back into real orders, applies your real costs and fees, and shows you exactly which orders, products, and discount codes are eating your margin — all without sending a single row of data anywhere.</p>
+      <div class="landing-actions">
+        <button id="btn-upload" class="btn btn-primary" type="button">Upload Orders CSV</button>
+        <button id="btn-sample" class="btn btn-secondary" type="button">Load sample data instead</button>
+        <input type="file" id="file-input" accept=".csv" class="visually-hidden" />
+      </div>
+      <p class="landing-note">Works with a standard Shopify "Orders" export. Don't have one handy? Use the sample data to see how it works first.</p>
+    </div>
+    <div class="landing-visual" aria-hidden="true">
+      <div class="mock-card">
+        <div class="mock-row"><span>Net revenue</span><b>$4,812.30</b></div>
+        <div class="mock-row bad"><span>Unprofitable orders</span><b>18%</b></div>
+        <div class="mock-bars">
+          <div class="mock-bar" style="height:70%"></div>
+          <div class="mock-bar bad" style="height:35%"></div>
+          <div class="mock-bar" style="height:85%"></div>
+          <div class="mock-bar" style="height:55%"></div>
+          <div class="mock-bar bad" style="height:20%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SETUP: mapping + config -->
+  <section id="setup" class="wrap section hidden">
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>1. Confirm your columns</h2>
+        <p class="muted" id="file-summary"></p>
+      </div>
+      <div id="mapping-warning" class="banner banner-warn hidden"></div>
+      <div id="mapping-grid" class="mapping-grid"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>2. Tell ProfitLeak your real costs</h2>
+        <p class="muted">These numbers drive every calculation below. Defaults are placeholders — adjust them to match your store.</p>
+      </div>
+
+      <div class="config-grid">
+        <label class="field">
+          <span>Default product cost (% of price)</span>
+          <input type="number" id="cfg-cost-pct" min="0" max="100" step="0.1" value="45" />
+        </label>
+        <label class="field">
+          <span>Payment processing fee (%)</span>
+          <input type="number" id="cfg-fee-pct" min="0" max="20" step="0.01" value="2.9" />
+        </label>
+        <label class="field">
+          <span>Payment processing fixed fee</span>
+          <input type="number" id="cfg-fee-fixed" min="0" step="0.01" value="0.30" />
+        </label>
+        <label class="field">
+          <span>Real shipping cost per order</span>
+          <input type="number" id="cfg-shipping-cost" min="0" step="0.01" value="6.00" />
+        </label>
+        <label class="field">
+          <span>Total advertising spend (period)</span>
+          <input type="number" id="cfg-ad-spend" min="0" step="0.01" value="150.00" />
+        </label>
+        <label class="field">
+          <span>Currency</span>
+          <select id="cfg-currency">
+            <option value="USD" selected>USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="CAD">CAD (CA$)</option>
+            <option value="AUD">AUD (A$)</option>
+          </select>
+        </label>
+        <label class="field checkbox-field">
+          <input type="checkbox" id="cfg-exclude-taxes" checked />
+          <span>Exclude sales tax from revenue</span>
+        </label>
+      </div>
+
+      <details class="sku-override">
+        <summary>Optional: per-SKU cost overrides</summary>
+        <p class="muted">One per line: <code>SKU,cost per unit</code>. Overrides the default % for that SKU only.</p>
+        <textarea id="cfg-sku-costs" rows="4" placeholder="TSHIRT-BLK-M,9.50&#10;HOODIE-GRY-L,24.00"></textarea>
+      </details>
+
+      <p class="muted note">Currency selection changes number formatting only — ProfitLeak does not convert between currencies. Make sure it matches the currency in your CSV.</p>
+
+      <div class="run-row">
+        <button id="btn-run" class="btn btn-primary btn-large" type="button" disabled>Run analysis</button>
+        <span id="run-blocker" class="muted"></span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="wrap section hidden">
+
+    <div id="warnings-banner" class="banner banner-warn hidden"></div>
+
+    <div class="dash-toolbar">
+      <h2 class="dash-title">Your profit picture</h2>
+      <div class="dash-toolbar-actions">
+        <button id="btn-export" class="btn btn-secondary btn-small" type="button">Export results (CSV)</button>
+        <button id="btn-delete" class="btn btn-danger-outline btn-small" type="button">Delete all imported data</button>
+      </div>
+    </div>
+
+    <div class="cards-grid" id="summary-cards"></div>
+
+    <div class="two-col">
+      <div class="panel chart-panel">
+        <h3>Profit by product</h3>
+        <canvas id="chart-products" width="560" height="320" role="img" aria-label="Bar chart of profit by product"></canvas>
+      </div>
+      <div class="panel chart-panel">
+        <h3>Where net revenue goes</h3>
+        <canvas id="chart-breakdown" width="560" height="320" role="img" aria-label="Pie chart of revenue breakdown"></canvas>
+        <ul id="breakdown-legend" class="legend"></ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Top 5 profit leaks</h3>
+      <div id="leaks-list" class="leaks-list"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Recommendations</h3>
+      <div class="two-col">
+        <div class="reco-box">
+          <div class="reco-label">Recommended free-shipping threshold</div>
+          <div class="reco-value" id="reco-threshold">—</div>
+          <p class="muted small">An evidence-based estimate from the lower range of your profitable orders' revenue — not a mathematically optimal figure.</p>
+        </div>
+        <div class="reco-box">
+          <div class="reco-label">Maximum safe discount</div>
+          <div class="reco-value" id="reco-discount">—</div>
+          <p class="muted small">The rough discount ceiling before an average order stops covering cost of goods, payment fees, and shipping (excludes advertising spend).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="table-controls">
+        <h3>Orders</h3>
+        <div class="table-controls-right">
+          <input type="search" id="order-search" placeholder="Search order number…" aria-label="Search orders" />
+          <select id="order-filter" aria-label="Filter orders">
+            <option value="all">All orders</option>
+            <option value="profitable">Profitable only</option>
+            <option value="unprofitable">Unprofitable only</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table id="orders-table" class="data-table">
+          <thead>
+            <tr>
+              <th data-sort="id">Order</th>
+              <th data-sort="itemCount">Items</th>
+              <th data-sort="netRevenue">Revenue</th>
+              <th data-sort="cogs">COGS</th>
+              <th data-sort="paymentFee">Fees</th>
+              <th data-sort="shippingCost">Shipping</th>
+              <th data-sort="adAllocation">Ad</th>
+              <th data-sort="refund">Refund</th>
+              <th data-sort="netProfit">Net profit</th>
+              <th data-sort="margin">Margin</th>
+              <th data-sort="risk">Risk</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody"></tbody>
+        </table>
+      </div>
+      <p id="orders-empty" class="muted small hidden">No orders match your current search/filter.</p>
+    </div>
+
+    <div class="panel">
+      <div class="table-controls">
+        <h3>Products</h3>
+        <div class="table-controls-right">
+          <input type="search" id="product-search" placeholder="Search SKU or name…" aria-label="Search products" />
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table id="products-table" class="data-table">
+          <thead>
+            <tr>
+              <th data-sort="sku">SKU</th>
+              <th data-sort="name">Name</th>
+              <th data-sort="unitsSold">Units sold</th>
+              <th data-sort="revenue">Revenue</th>
+              <th data-sort="cost">Cost</th>
+              <th data-sort="profit">Profit</th>
+              <th data-sort="margin">Margin</th>
+              <th data-sort="risk">Risk</th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody"></tbody>
+        </table>
+      </div>
+      <p id="products-empty" class="muted small hidden">No products match your search.</p>
+    </div>
+
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Privacy:</strong> ProfitLeak parses your CSV and runs every calculation locally in this browser tab using JavaScript. No file, row, or number is ever sent to a server, logged, or stored outside this session — closing or reloading the tab clears everything.</p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

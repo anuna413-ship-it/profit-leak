@@ -1,0 +1,20 @@
+Name,Email,Financial Status,Fulfillment Status,Currency,Subtotal,Shipping,Taxes,Total,Discount Code,Discount Amount,Created at,Lineitem quantity,Lineitem name,Lineitem price,Lineitem sku,Billing Province,Refunded Amount
+#1001,ren@example.com,paid,fulfilled,USD,50.00,5.00,4.40,59.40,,0.00,2024-05-01,2,Classic Tee - Black / M,25.00,TSHIRT-BLK-M,CA,0.00
+#1002,jae@example.com,paid,fulfilled,USD,70.00,0.00,6.30,69.30,WELCOME10,7.00,2024-05-02,1,Ceramic Mug,15.00,MUG-CERAMIC,CA,0.00
+#1002,jae@example.com,paid,fulfilled,USD,70.00,0.00,6.30,69.30,WELCOME10,7.00,2024-05-02,1,Pullover Hoodie - Grey / L,55.00,HOODIE-GRY-L,CA,0.00
+#1003,sam@example.com,paid,fulfilled,USD,24.00,5.00,2.32,31.32,,0.00,2024-05-02,3,Sticker Pack (5),8.00,STICKER-PACK,NY,0.00
+#1004,lee@example.com,paid,fulfilled,USD,44.00,8.00,3.96,55.96,,0.00,2024-05-03,2,Lavender Candle,22.00,CANDLE-LAV,NY,0.00
+#1005,kim@example.com,refunded,fulfilled,USD,18.00,5.00,1.84,24.84,,0.00,2024-05-03,1,Canvas Tote Bag,18.00,TOTE-CANVAS,TX,24.84
+#1006,ari@example.com,paid,fulfilled,USD,63.00,0.00,5.67,56.07,SUMMER20,12.60,2024-05-04,1,Classic Tee - Black / M,25.00,TSHIRT-BLK-M,TX,0.00
+#1006,ari@example.com,paid,fulfilled,USD,63.00,0.00,5.67,56.07,SUMMER20,12.60,2024-05-04,2,Ceramic Mug,15.00,MUG-CERAMIC,TX,0.00
+#1006,ari@example.com,paid,fulfilled,USD,63.00,0.00,5.67,56.07,SUMMER20,12.60,2024-05-04,1,Sticker Pack (5),8.00,STICKER-PACK,TX,0.00
+#1007,mo@example.com,paid,fulfilled,USD,20.00,5.00,2.25,27.25,,0.00,2024-05-05,1,Phone Case - iPhone 15,20.00,PHONECASE-IP15,WA,0.00
+#1008,noor@example.com,paid,fulfilled,USD,28.00,5.00,2.97,35.97,,0.00,2024-05-05,1,Steel Water Bottle,28.00,WATERBOTTLE-STL,WA,0.00
+#1009,pat@example.com,paid,fulfilled,USD,80.00,0.00,7.20,75.20,VIP15,12.00,2024-05-06,1,Pullover Hoodie - Grey / L,55.00,HOODIE-GRY-L,OR,0.00
+#1009,pat@example.com,paid,fulfilled,USD,80.00,0.00,7.20,75.20,VIP15,12.00,2024-05-06,1,Classic Tee - Black / M,25.00,TSHIRT-BLK-M,OR,0.00
+#1010,dee@example.com,paid,fulfilled,USD,22.00,5.00,2.43,29.43,,0.00,2024-05-07,1,Lavender Candle,22.00,CANDLE-LAV,OR,0.00
+#1011,fen@example.com,partially_refunded,fulfilled,USD,46.00,5.00,4.59,55.59,,0.00,2024-05-07,2,Ceramic Mug,15.00,MUG-CERAMIC,CA,15.00
+#1011,fen@example.com,partially_refunded,fulfilled,USD,46.00,5.00,4.59,55.59,,0.00,2024-05-07,2,Sticker Pack (5),8.00,STICKER-PACK,CA,15.00
+#1012,gil@example.com,paid,fulfilled,USD,131.00,0.00,11.79,136.24,LOYAL5,6.55,2024-05-08,3,Classic Tee - Black / M,25.00,TSHIRT-BLK-M,NY,0.00
+#1012,gil@example.com,paid,fulfilled,USD,131.00,0.00,11.79,136.24,LOYAL5,6.55,2024-05-08,2,Canvas Tote Bag,18.00,TOTE-CANVAS,NY,0.00
+#1012,gil@example.com,paid,fulfilled,USD,131.00,0.00,11.79,136.24,LOYAL5,6.55,2024-05-08,1,Phone Case - iPhone 15,20.00,PHONECASE-IP15,NY,0.00
